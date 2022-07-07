@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { MdCircle, MdReceiptLong } from 'react-icons/md'
+import { MdCircle, MdOutlineReceipt } from 'react-icons/md'
 
 import { ContainerInvoices, MainContainer } from './styles'
 import { DefaultPalettColors } from '../../assets/colors'
@@ -89,7 +89,10 @@ export const Invoices = () => {
     <MainContainer>
       <Header
         icon={
-          <MdReceiptLong color={DefaultPalettColors.invoice.orange} size={24} />
+          <MdOutlineReceipt
+            color={DefaultPalettColors.invoice.orange}
+            size={24}
+          />
         }
         label={'Notas'}
       />
