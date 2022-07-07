@@ -11,5 +11,5 @@ export const Container = styled.div`
   max-height: 100px;
   min-height: 100px;
   color: white;
-  flex: 1;
+  flex: 1; ;
 `;

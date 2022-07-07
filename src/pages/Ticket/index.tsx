@@ -24,8 +24,8 @@ export const Ticket = () => {
 
   const { currentInvoice } = useInvoice();
   const videoConstraints = {
-    // facingMode: { exact: "environment" },
-    facingMode: "user",
+    facingMode: { exact: "environment" },
+    // facingMode: "user",
   };
 
   const webcamRef = useRef<Webcam>(null);
@@ -55,7 +55,7 @@ export const Ticket = () => {
         ...currentInvoice,
         base64_image: image,
       });
-      alert("Foto enviada!");
+      // alert("Foto enviada!");
     }
   };
 

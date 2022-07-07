@@ -36,70 +36,49 @@ export interface IInvoice {
 }
 
 export const Invoices = () => {
-  const isOnline = useOnlineStatus();
+  // const isOnline = useOnlineStatus();
   const navigate = useNavigate();
-  const [invoices, setInvoices] = useState<IInvoice[]>([]);
-  const { setCurrentInvoice } = useInvoice();
+  const { setCurrentInvoice, invoices, setInvoices } = useInvoice();
 
-  useEffect(() => {
-    console.log("onlinestatus", isOnline);
-  }, [isOnline]);
+  // useEffect(() => {
+  //   console.log("onlinestatus", isOnline);
+  // }, [isOnline]);
 
   const invoicesCollectionRef = collection(db, "invoice");
   // const alovelaceDocumentRef = collection("users").doc("alovelace");
 
+  // const [teste, setTeste] = useState("");
+
   useEffect(() => {
     const getInvoices = async () => {
-      // const q = query(collection(db, "invoice"));
-      // onSnapshot(q, { includeMetadataChanges: true }, (snapshot) => {
-      //   const teste = snapshot.data();
-      //   console.log("teste--", teste);
-      //   // snapshot.docChanges().forEach((change) => {
-      //   //   const teste = change.doc.data();
-      //   //   console.log("change", teste);
-      //   //   const source = snapshot.metadata.fromCache ? "local cache" : "server";
-      //   //   console.log("Data came from " + source);
-      //   // });
-      // });
-
-      if (!isOnline) {
-        console.log("teste");
-        await getDocsFromCache(invoicesCollectionRef)
-          .then((data) => {
-            console.log("datafromcache", data.docs);
+      getDocs(invoicesCollectionRef)
+        .then((data) => {
+          // console.log("data::", data);
+          // setTeste(JSON.stringify(data.docs));
+          if (data.docs.length > 0) {
             setInvoices(
               data.docs.map((doc) => ({
                 ...(doc.data() as IInvoice),
                 id: doc.id,
               }))
             );
-          })
-          .catch((error) => {
-            console.log("erroe", error);
-          });
-      }
-      getDocs(invoicesCollectionRef)
-        .then((data) => {
-          setInvoices(
-            data.docs.map((doc) => ({
-              ...(doc.data() as IInvoice),
-              id: doc.id,
-            }))
-          );
+          }
         })
         .catch((error) => {
-          console.log("erroe", error);
+          console.log("erro", error);
         });
     };
 
+    // if (isOnline) {
     getInvoices();
+    // }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    console.log(invoices);
-  }, [invoices]);
+  // useEffect(() => {
+  //   console.log(invoices);
+  // }, [invoices]);
 
   const handleSelectInvoice = (invoice: IInvoice) => {
     setCurrentInvoice(invoice);
@@ -150,6 +129,7 @@ export const Invoices = () => {
             </Card.Body>
           </Card>
         ))}
+        {/* <div>{teste}</div> */}
       </ContainerInvoices>
       <Footer>
         <div>
