@@ -171,7 +171,7 @@ export const Invoices = () => {
             gap: 4,
           }}
         >
-          <MdCircle color={DefaultPalettColors.invoice.orange} />
+          <MdCircle color={DefaultPalettColors.invoice.red} />
           <span>Pendente</span>
         </div>
       </Footer>

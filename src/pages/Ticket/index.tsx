@@ -12,12 +12,13 @@ import { useNavigate } from "react-router-dom";
 import Webcam from "react-webcam";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useInvoice } from "../../Shared/contextInvoice";
+import { EnumStatusInvoiceTicket } from "../../mocks";
 
 export const Ticket = () => {
   // const storage = getStorage();
   // const invoicesCollectionRef = collection(db, "invoice");
 
-  const { currentInvoice } = useInvoice();
+  const { currentInvoice, setInvoices, invoices } = useInvoice();
   const videoConstraints = {
     facingMode: { exact: "environment" },
     // facingMode: "user",
@@ -33,6 +34,7 @@ export const Ticket = () => {
         setShowCamera(false);
         setImageFromCamera(imageTaked);
         updateInvoice(imageTaked);
+        updateLocalInvoice(imageTaked);
         // console.log(imageFromCamera);
       }
     }
@@ -43,12 +45,22 @@ export const Ticket = () => {
 
   const navigate = useNavigate();
 
+  const updateLocalInvoice = (image: string) => {
+    const newInvoices = invoices.map((invoice) => {
+      return invoice?.id === currentInvoice?.id
+        ? { ...currentInvoice, base64_image: image }
+        : invoice;
+    });
+    setInvoices(newInvoices);
+  };
+
   const updateInvoice = async (image: string) => {
     if (currentInvoice?.id) {
       const invoiceDoc = doc(db, "invoice", currentInvoice.id);
       await updateDoc(invoiceDoc, {
         ...currentInvoice,
         base64_image: image,
+        status: EnumStatusInvoiceTicket.sent,
       });
       // alert("Foto enviada!");
     }
@@ -120,10 +132,10 @@ export const Ticket = () => {
           }}
         >
           <Col xs={1}>
-            <MdArrowBack size={32} onClick={() => navigate("/invoices")} />
+            <MdDelete size={32} onClick={handleDeleImage} />
           </Col>
           <Col xs={2}>
-            <MdDelete size={32} onClick={handleDeleImage} />
+            <MdArrowBack size={32} onClick={() => navigate("/invoices")} />
           </Col>
         </Row>
       </Footer>
