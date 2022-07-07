@@ -1,67 +1,62 @@
-import Header from "../../components/Header";
-import Footer from "../../components/Footer";
-import { Row, Col, Button } from "react-bootstrap";
+import Header from '../../components/Header'
+import Footer from '../../components/Footer'
+import { Row, Col, Button } from 'react-bootstrap'
 // import { getStorage, ref, uploadString } from "@firebase/storage";
-import { Container, MainContainer } from "./styles";
-import { doc, updateDoc } from "firebase/firestore";
-import { db } from "./../../firebase.config";
+import { Container, MainContainer } from './styles'
+import { doc, updateDoc } from 'firebase/firestore'
+import { db } from './../../firebase.config'
 
-import {
-  MdLocalShipping,
-  MdCheck,
-  MdAddAPhoto,
-  MdArrowBack,
-} from "react-icons/md";
-import { useNavigate } from "react-router-dom";
+import { MdCheck, MdAddAPhoto, MdArrowBack, MdCamera } from 'react-icons/md'
+import { useNavigate } from 'react-router-dom'
 // import { expenseCategory } from '../../mocks'
-import Webcam from "react-webcam";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useInvoice } from "../../Shared/contextInvoice";
+import Webcam from 'react-webcam'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { useInvoice } from '../../Shared/contextInvoice'
 
 export const Ticket = () => {
   // const storage = getStorage();
   // const invoicesCollectionRef = collection(db, "invoice");
 
-  const { currentInvoice } = useInvoice();
+  const { currentInvoice } = useInvoice()
   const videoConstraints = {
-    facingMode: { exact: "environment" },
+    facingMode: { exact: 'environment' }
     // facingMode: "user",
-  };
+  }
 
-  const webcamRef = useRef<Webcam>(null);
-  const [imageFromCamera, setImageFromCamera] = useState("");
+  const webcamRef = useRef<Webcam>(null)
+  const [imageFromCamera, setImageFromCamera] = useState('')
 
   const capture = useCallback(() => {
     if (webcamRef) {
-      const imageTaked = webcamRef?.current?.getScreenshot();
+      const imageTaked = webcamRef?.current?.getScreenshot()
       if (imageTaked) {
-        setShowCamera(false);
-        setImageFromCamera(imageTaked);
-        updateInvoice(imageTaked);
+        setShowCamera(false)
+        setImageFromCamera(imageTaked)
+        updateInvoice(imageTaked)
         // console.log(imageFromCamera);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [webcamRef]);
+  }, [webcamRef])
 
-  const [showCamera, setShowCamera] = useState(false);
+  const [showCamera, setShowCamera] = useState(false)
 
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   const updateInvoice = async (image: string) => {
-    if (currentInvoice?.id && image !== "") {
-      const invoiceDoc = doc(db, "invoice", currentInvoice.id);
+    if (currentInvoice?.id && image !== '') {
+      const invoiceDoc = doc(db, 'invoice', currentInvoice.id)
       await updateDoc(invoiceDoc, {
         ...currentInvoice,
-        base64_image: image,
-      });
+        base64_image: image
+      })
       // alert("Foto enviada!");
     }
-  };
+  }
 
   useEffect(() => {
-    setImageFromCamera(currentInvoice?.base64_image || "");
-  }, [currentInvoice]);
+    setImageFromCamera(currentInvoice?.base64_image || '')
+  }, [currentInvoice])
 
   // useEffect(() => {
   //   const handleUpload = async () => {
@@ -77,24 +72,21 @@ export const Ticket = () => {
 
   return (
     <MainContainer>
-      <Header
-        icon={<MdLocalShipping color="#FB8500" size={24} />}
-        label={"Foto"}
-      />
+      <Header icon={<MdCamera color="#FB8500" size={24} />} label={'Foto'} />
       <Container>
         {!showCamera && (
           <>
             <Row
               style={{
-                width: "100%",
-                border: "1px dashed black",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+                width: '100%',
+                border: '1px dashed black',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
               }}
             >
-              {imageFromCamera !== "" ? (
-                <img src={imageFromCamera} alt={""} />
+              {imageFromCamera !== '' ? (
+                <img src={imageFromCamera} alt={''} />
               ) : (
                 <MdAddAPhoto size={150} onClick={() => setShowCamera(true)} />
               )}
@@ -102,7 +94,7 @@ export const Ticket = () => {
           </>
         )}
         {showCamera && (
-          <div style={{ maxWidth: "90%" }}>
+          <div style={{ maxWidth: '90%' }}>
             <Webcam
               audio={false}
               ref={webcamRef}
@@ -117,19 +109,19 @@ export const Ticket = () => {
       <Footer>
         <Row
           style={{
-            width: "100%",
-            display: "flex",
-            justifyContent: "space-between",
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'space-between'
           }}
         >
           <Col xs={1}>
-            <MdArrowBack size={32} onClick={() => navigate("/invoices")} />
+            <MdArrowBack size={32} onClick={() => navigate('/invoices')} />
           </Col>
           <Col xs={2}>
-            <MdCheck size={32} onClick={() => navigate("/invoices")} />
+            <MdCheck size={32} onClick={() => navigate('/invoices')} />
           </Col>
         </Row>
       </Footer>
     </MainContainer>
-  );
-};
+  )
+}
