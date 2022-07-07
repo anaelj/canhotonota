@@ -33,8 +33,8 @@ export const Ticket = () => {
       if (imageTaked) {
         setShowCamera(false);
         setImageFromCamera(imageTaked);
-        updateInvoice(imageTaked);
         updateLocalInvoice(imageTaked);
+        updateInvoice(imageTaked);
         // console.log(imageFromCamera);
       }
     }
@@ -45,10 +45,19 @@ export const Ticket = () => {
 
   const navigate = useNavigate();
 
-  const updateLocalInvoice = (image: string) => {
+  const updateLocalInvoice = (
+    image: string,
+    firebaseUpdated: boolean = false
+  ) => {
     const newInvoices = invoices.map((invoice) => {
       return invoice?.id === currentInvoice?.id
-        ? { ...currentInvoice, base64_image: image }
+        ? {
+            ...currentInvoice,
+            base64_image: image,
+            status: firebaseUpdated
+              ? EnumStatusInvoiceTicket.sent
+              : EnumStatusInvoiceTicket.pending,
+          }
         : invoice;
     });
     setInvoices(newInvoices);
@@ -60,11 +69,21 @@ export const Ticket = () => {
       await updateDoc(invoiceDoc, {
         ...currentInvoice,
         base64_image: image,
-        status: EnumStatusInvoiceTicket.sent,
+        status:
+          image === ""
+            ? EnumStatusInvoiceTicket.pending
+            : EnumStatusInvoiceTicket.sent,
       });
       // alert("Foto enviada!");
     }
   };
+
+  useEffect(() => {
+    if (imageFromCamera === "" && currentInvoice?.base64_image === "") {
+      setShowCamera(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [imageFromCamera]);
 
   useEffect(() => {
     setImageFromCamera(currentInvoice?.base64_image || "");
