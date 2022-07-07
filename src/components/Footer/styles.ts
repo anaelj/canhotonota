@@ -12,6 +12,4 @@ export const Container = styled.div`
   min-height: 100px;
   color: white;
   flex: 1;
-  position: fixed;
-  bottom: 0;
 `;
