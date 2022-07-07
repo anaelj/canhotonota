@@ -1,8 +1,11 @@
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { Row, Col, Button } from "react-bootstrap";
-
+// import { getStorage, ref, uploadString } from "@firebase/storage";
 import { Container, MainContainer } from "./styles";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "./../../firebase.config";
+
 import {
   MdLocalShipping,
   MdCheck,
@@ -12,12 +15,17 @@ import {
 import { useNavigate } from "react-router-dom";
 // import { expenseCategory } from '../../mocks'
 import Webcam from "react-webcam";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useInvoice } from "../../Shared/contextInvoice";
 
 export const Ticket = () => {
+  // const storage = getStorage();
+  // const invoicesCollectionRef = collection(db, "invoice");
+
+  const { currentInvoice } = useInvoice();
   const videoConstraints = {
-    facingMode: { exact: "environment" },
-    // facingMode: "user",
+    // facingMode: { exact: "environment" },
+    facingMode: "user",
   };
 
   const webcamRef = useRef<Webcam>(null);
@@ -25,18 +33,48 @@ export const Ticket = () => {
 
   const capture = useCallback(() => {
     if (webcamRef) {
-      console.log(webcamRef);
-      const imageFromCamera = webcamRef?.current?.getScreenshot();
-      if (imageFromCamera) {
+      const imageTaked = webcamRef?.current?.getScreenshot();
+      if (imageTaked) {
         setShowCamera(false);
-        setImageFromCamera(imageFromCamera);
+        setImageFromCamera(imageTaked);
+        updateInvoice(imageTaked);
+        // console.log(imageFromCamera);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [webcamRef]);
 
   const [showCamera, setShowCamera] = useState(false);
 
   const navigate = useNavigate();
+
+  const updateInvoice = async (image: string) => {
+    if (currentInvoice?.id && image !== "") {
+      const invoiceDoc = doc(db, "invoice", currentInvoice.id);
+      await updateDoc(invoiceDoc, {
+        ...currentInvoice,
+        base64_image: image,
+      });
+      alert("Foto enviada!");
+    }
+  };
+
+  useEffect(() => {
+    setImageFromCamera(currentInvoice?.base64_image || "");
+  }, [currentInvoice]);
+
+  // useEffect(() => {
+  //   const handleUpload = async () => {
+  //     const fileName = new Date().getTime();
+  //     const storageRef = ref(storage, `/images/${fileName}.png`);
+
+  //     uploadString(storageRef, imageFromCamera, "data_url").then((snapshot) => {
+  //       console.log(snapshot);
+  //     });
+  //   };
+  //   handleUpload();
+  // }, [imageFromCamera]);
+
   return (
     <MainContainer>
       <Header

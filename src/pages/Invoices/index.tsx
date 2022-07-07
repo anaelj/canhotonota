@@ -1,18 +1,110 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MdCircle, MdLocalShipping } from "react-icons/md";
 
 import { ContainerInvoices, MainContainer } from "./styles";
 import { DefaultPalettColors } from "../../assets/colors";
+import { db } from "./../../firebase.config";
 
-import { invoices } from "../../mocks";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { Card, Row, Col } from "react-bootstrap";
 import { getIconStatus } from "../../assets/makeIcon";
 
+import {
+  collection,
+  getDocs,
+  query,
+  onSnapshot,
+  getDocsFromCache,
+} from "firebase/firestore";
+
+import { useInvoice } from "../../Shared/contextInvoice";
+import { useOnlineStatus } from "../../Shared/contextOnlineStatus";
+
+interface ICustomer {
+  address: string;
+  name: string;
+}
+
+export interface IInvoice {
+  id: string;
+  invoice_number: string;
+  status: string;
+  customer: ICustomer;
+  base64_image?: string;
+}
+
 export const Invoices = () => {
+  const isOnline = useOnlineStatus();
   const navigate = useNavigate();
+  const [invoices, setInvoices] = useState<IInvoice[]>([]);
+  const { setCurrentInvoice } = useInvoice();
+
+  useEffect(() => {
+    console.log("onlinestatus", isOnline);
+  }, [isOnline]);
+
+  const invoicesCollectionRef = collection(db, "invoice");
+  // const alovelaceDocumentRef = collection("users").doc("alovelace");
+
+  useEffect(() => {
+    const getInvoices = async () => {
+      // const q = query(collection(db, "invoice"));
+      // onSnapshot(q, { includeMetadataChanges: true }, (snapshot) => {
+      //   const teste = snapshot.data();
+      //   console.log("teste--", teste);
+      //   // snapshot.docChanges().forEach((change) => {
+      //   //   const teste = change.doc.data();
+      //   //   console.log("change", teste);
+      //   //   const source = snapshot.metadata.fromCache ? "local cache" : "server";
+      //   //   console.log("Data came from " + source);
+      //   // });
+      // });
+
+      if (!isOnline) {
+        console.log("teste");
+        await getDocsFromCache(invoicesCollectionRef)
+          .then((data) => {
+            console.log("datafromcache", data.docs);
+            setInvoices(
+              data.docs.map((doc) => ({
+                ...(doc.data() as IInvoice),
+                id: doc.id,
+              }))
+            );
+          })
+          .catch((error) => {
+            console.log("erroe", error);
+          });
+      }
+      getDocs(invoicesCollectionRef)
+        .then((data) => {
+          setInvoices(
+            data.docs.map((doc) => ({
+              ...(doc.data() as IInvoice),
+              id: doc.id,
+            }))
+          );
+        })
+        .catch((error) => {
+          console.log("erroe", error);
+        });
+    };
+
+    getInvoices();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    console.log(invoices);
+  }, [invoices]);
+
+  const handleSelectInvoice = (invoice: IInvoice) => {
+    setCurrentInvoice(invoice);
+    navigate("/ticket");
+  };
 
   return (
     <MainContainer>
@@ -31,12 +123,12 @@ export const Invoices = () => {
             key={invoice.invoice_number}
             text={"light"}
             bg={"secondary"}
-            style={{ width: "100%", margin: "0px" }}
+            style={{ width: "100%", margin: "0px", padding: "0px" }}
             className="mb-2"
-            onClick={() => navigate("/ticket")}
+            onClick={() => handleSelectInvoice(invoice)}
           >
             <Card.Header>
-              <span>Noda: </span>
+              <span>Nota: </span>
               <span>{invoice.invoice_number}</span>
             </Card.Header>
             <Card.Body>

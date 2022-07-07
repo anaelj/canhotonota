@@ -1,19 +1,26 @@
 import styled from "styled-components";
 
 export const MainContainer = styled.div`
-  height: 100vh;
   background-color: #fcfcfc;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
+  align-items: stretch;
+  flex: 2;
+  height: 100vh;
+
+  /* align-items: center; */
+  /* background: red; */
 `;
 export const ContainerInvoices = styled.div`
-  height: 100%;
+  /* height: auto; */
+  margin-top: 0px;
+  padding: 5px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 2rem 1rem;
-  gap: 1rem;
   overflow-y: scroll;
+  flex: 2;
+  /* background: green; */
 `;
 
 export const CardTravel = styled.div`
